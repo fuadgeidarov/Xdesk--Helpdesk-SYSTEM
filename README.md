@@ -4,7 +4,7 @@ Self-hosted helpdesk portal with ticket management, roles, knowledge base, analy
 
 Stack: **Next.js 15 + React 19 + Prisma + PostgreSQL 16 + Docker Compose + Nginx**.
 
-> This repository is a public template. It contains \\\\\\\\\\\\\\\*\\\\\\\\\\\\\\\*no production passwords, bot tokens, SMTP credentials, TLS private keys, company accounts, or private deployment IP addresses\\\\\\\\\\\\\\\*\\\\\\\\\\\\\\\*.
+> This repository is a public template. It contains \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*no production passwords, bot tokens, SMTP credentials, TLS private keys, company accounts, or private deployment IP addresses\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*.
 
 ## Features
 
@@ -50,26 +50,26 @@ cp .env.example .env
 Edit `.env`. At minimum change:
 
 ```env
-POSTGRES\\\\\\\\\\\\\\\_PASSWORD=YOUR\\\\\\\\\\\\\\\_STRONG\\\\\\\\\\\\\\\_DATABASE\\\\\\\\\\\\\\\_PASSWORD
-AUTH\\\\\\\\\\\\\\\_SECRET=YOUR\\\\\\\\\\\\\\\_LONG\\\\\\\\\\\\\\\_RANDOM\\\\\\\\\\\\\\\_SECRET\\\\\\\\\\\\\\\_AT\\\\\\\\\\\\\\\_LEAST\\\\\\\\\\\\\\\_32\\\\\\\\\\\\\\\_CHARS
+POSTGRES\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_PASSWORD=YOUR\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_STRONG\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_DATABASE\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_PASSWORD
+AUTH\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_SECRET=YOUR\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_LONG\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_RANDOM\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_SECRET\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_AT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_LEAST\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_32\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_CHARS
 ```
 
 For a local HTTP installation:
 
 ```env
-APP\\\\\\\\\\\\\\\_URL=http://localhost
-PUBLIC\\\\\\\\\\\\\\\_HOST=localhost
-TLS\\\\\\\\\\\\\\\_CERT\\\\\\\\\\\\\\\_NAME=localhost
-COOKIE\\\\\\\\\\\\\\\_SECURE=false
+APP\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_URL=http://localhost
+PUBLIC\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_HOST=localhost
+TLS\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_CERT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_NAME=localhost
+COOKIE\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_SECURE=false
 ```
 
 For a public IPv4 installation, for example `203.0.113.10`:
 
 ```env
-APP\\\\\\\\\\\\\\\_URL=https://203.0.113.10
-PUBLIC\\\\\\\\\\\\\\\_HOST=203.0.113.10
-TLS\\\\\\\\\\\\\\\_CERT\\\\\\\\\\\\\\\_NAME=203.0.113.10
-COOKIE\\\\\\\\\\\\\\\_SECURE=true
+APP\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_URL=https://203.0.113.10
+PUBLIC\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_HOST=203.0.113.10
+TLS\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_CERT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_NAME=203.0.113.10
+COOKIE\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_SECURE=true
 ```
 
 `203.0.113.10` is only a documentation example. Replace it with your own address.
@@ -110,13 +110,13 @@ No real passwords are included in this repository and demo seeding is disabled b
 For a temporary test installation, set:
 
 ```env
-SEED\\\\\\\\\\\\\\\_DEFAULT\\\\\\\\\\\\\\\_USERS=auto
-SEED\\\\\\\\\\\\\\\_ADMIN\\\\\\\\\\\\\\\_EMAIL=admin@xdesk.local
-SEED\\\\\\\\\\\\\\\_AGENT\\\\\\\\\\\\\\\_EMAIL=agent@xdesk.local
-SEED\\\\\\\\\\\\\\\_USER\\\\\\\\\\\\\\\_EMAIL=user@xdesk.local
-SEED\\\\\\\\\\\\\\\_ADMIN\\\\\\\\\\\\\\\_PASSWORD=CHOOSE\\\\\\\\\\\\\\\_YOUR\\\\\\\\\\\\\\\_OWN\\\\\\\\\\\\\\\_PASSWORD
-SEED\\\\\\\\\\\\\\\_AGENT\\\\\\\\\\\\\\\_PASSWORD=CHOOSE\\\\\\\\\\\\\\\_YOUR\\\\\\\\\\\\\\\_OWN\\\\\\\\\\\\\\\_PASSWORD
-SEED\\\\\\\\\\\\\\\_USER\\\\\\\\\\\\\\\_PASSWORD=CHOOSE\\\\\\\\\\\\\\\_YOUR\\\\\\\\\\\\\\\_OWN\\\\\\\\\\\\\\\_PASSWORD
+SEED\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_DEFAULT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_USERS=auto
+SEED\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_ADMIN\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_EMAIL=admin@xdesk.local
+SEED\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_AGENT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_EMAIL=agent@xdesk.local
+SEED\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_USER\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_EMAIL=user@xdesk.local
+SEED\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_ADMIN\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_PASSWORD=CHOOSE\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_YOUR\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_OWN\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_PASSWORD
+SEED\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_AGENT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_PASSWORD=CHOOSE\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_YOUR\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_OWN\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_PASSWORD
+SEED\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_USER\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_PASSWORD=CHOOSE\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_YOUR\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_OWN\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_PASSWORD
 ```
 
 Each password must be at least 12 characters. Restart the app after changing the values:
@@ -128,7 +128,7 @@ docker compose up -d
 For production, create your required users and then set:
 
 ```env
-SEED\\\\\\\\\\\\\\\_DEFAULT\\\\\\\\\\\\\\\_USERS=false
+SEED\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_DEFAULT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_USERS=false
 ```
 
 Never publish your real `.env`.
@@ -161,9 +161,9 @@ docker compose up -d
 Create a bot using the official `@BotFather`, then configure:
 
 ```env
-TELEGRAM\\\\\\\\\\\\\\\_BOT\\\\\\\\\\\\\\\_ENABLED=true
-TELEGRAM\\\\\\\\\\\\\\\_BOT\\\\\\\\\\\\\\\_TOKEN=YOUR\\\\\\\\\\\\\\\_OWN\\\\\\\\\\\\\\\_BOT\\\\\\\\\\\\\\\_TOKEN
-BOT\\\\\\\\\\\\\\\_COMPANY\\\\\\\\\\\\\\\_NAME=Your Company
+TELEGRAM\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_BOT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_ENABLED=true
+TELEGRAM\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_BOT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_TOKEN=YOUR\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_OWN\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_BOT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_TOKEN
+BOT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_COMPANY\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_NAME=Your Company
 ```
 
 Restart:
@@ -179,18 +179,18 @@ The integration uses **Long Polling**, so a Telegram webhook is not required. Se
 SMTP is optional. Example for a generic provider:
 
 ```env
-SMTP\\\\\\\\\\\\\\\_PROVIDER=custom
-SMTP\\\\\\\\\\\\\\\_HOST=smtp.example.com
-SMTP\\\\\\\\\\\\\\\_PORT=465
-SMTP\\\\\\\\\\\\\\\_SECURE=true
-SMTP\\\\\\\\\\\\\\\_USER=notifications@example.com
-SMTP\\\\\\\\\\\\\\\_PASSWORD=YOUR\\\\\\\\\\\\\\\_APP\\\\\\\\\\\\\\\_OR\\\\\\\\\\\\\\\_SMTP\\\\\\\\\\\\\\\_PASSWORD
-SMTP\\\\\\\\\\\\\\\_FROM="Xdesk <notifications@example.com>"
+SMTP\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_PROVIDER=custom
+SMTP\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_HOST=smtp.example.com
+SMTP\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_PORT=465
+SMTP\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_SECURE=true
+SMTP\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_USER=notifications@example.com
+SMTP\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_PASSWORD=YOUR\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_APP\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_OR\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_SMTP\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_PASSWORD
+SMTP\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_FROM="Xdesk <notifications@example.com>"
 ```
 
-Gmail and Mail.ru presets are supported by setting `SMTP\\\\\\\\\\\\\\\_PROVIDER=gmail` or `SMTP\\\\\\\\\\\\\\\_PROVIDER=mailru`. Use provider-specific app passwords where required; do not commit them.
+Gmail and Mail.ru presets are supported by setting `SMTP\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_PROVIDER=gmail` or `SMTP\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_PROVIDER=mailru`. Use provider-specific app passwords where required; do not commit them.
 
-`APP\\\\\\\\\\\\\\\_URL` must be the actual URL users can open, otherwise password-reset links will point to the wrong address.
+`APP\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_URL` must be the actual URL users can open, otherwise password-reset links will point to the wrong address.
 
 ## 8\. HTTPS on a public IPv4 address
 
@@ -201,7 +201,7 @@ This repository includes optional Windows helper scripts for Let's Encrypt IP ce
 * `RENEW-HTTPS-CERT.cmd`
 * `CREATE-HTTPS-RENEW-TASK.cmd`
 
-They read the public IP from `PUBLIC\\\\\\\\\\\\\\\_HOST` in `.env`; no deployment IP is hard-coded in the repository.
+They read the public IP from `PUBLIC\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_HOST` in `.env`; no deployment IP is hard-coded in the repository.
 
 See [docs/HTTPS-IP.md](docs/HTTPS-IP.md).
 
@@ -227,11 +227,11 @@ docker compose up -d --build
 
 * Replace every placeholder in `.env`
 * Use a strong PostgreSQL password
-* Use a long random `AUTH\\\\\\\\\\\\\\\_SECRET`
+* Use a long random `AUTH\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_SECRET`
 * Keep `.env` outside Git history
 * Keep Telegram and SMTP secrets only in `.env`
 * Use HTTPS for internet-facing installations
-* Set `COOKIE\\\\\\\\\\\\\\\_SECURE=true` when using HTTPS
+* Set `COOKIE\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_SECURE=true` when using HTTPS
 * Back up the PostgreSQL volume and uploads
 * Restrict router/firewall rules to only required ports
 * Never commit TLS private keys or ACME directories
@@ -244,51 +244,53 @@ See [SECURITY.md](SECURITY.md).
 
 `.gitignore` and `.dockerignore` exclude secrets, `.env`, TLS keys, uploads, build output and local runtime files. Always run `git status` before every commit and verify that no secret file is staged.
 
-## License
+## \## License
 
-MIT. See [LICENSE](LICENSE).
+## 
 
+## MIT. See \[LICENSE](LICENSE).
 
+## 
 
-\## Screenshots
+## \## Screenshots
 
+## 
 
+## \### Landing page
 
-\### Landing page
+## 
 
+## !\[Xdesk landing page](docs/images/landing.png)
 
+## 
 
-!\[Xdesk landing page](docs/images/landing.png)
+## \### Ticket queue
 
+## 
 
+## !\[Xdesk ticket queue](docs/images/ticket-queue.png)
 
-\### Ticket queue
+## 
 
+## \### User profile
 
+## 
 
-!\[Xdesk ticket queue](docs/images/ticket-queue.png)
+## !\[Xdesk profile](docs/images/profile.png)
 
+## 
 
+## \### Telegram bot
 
-\### User profile
+## 
 
+## !\[Xdesk Telegram bot](docs/images/telegram-bot.png)
 
+## 
 
-!\[Xdesk profile](docs/images/profile.png)
+## \## Quick Start
 
+## 
 
-
-\### Telegram bot
-
-
-
-!\[Xdesk Telegram bot](docs/images/telegram-bot.png)
-
-
-
-\## Quick Start
-
-
-
-!\[Xdesk Quick Start](docs/images/quick-start.png)
+## !\[Xdesk Quick Start](docs/images/quick-start.png)
 
