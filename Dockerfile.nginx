@@ -1,0 +1,6 @@
+FROM nginx:1.27-alpine
+COPY nginx/bootstrap.conf /opt/xdesk-nginx/bootstrap.conf
+COPY nginx/https.conf /opt/xdesk-nginx/https.conf
+COPY nginx-entrypoint.sh /usr/local/bin/xdesk-nginx-entrypoint.sh
+RUN chmod +x /usr/local/bin/xdesk-nginx-entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/xdesk-nginx-entrypoint.sh"]

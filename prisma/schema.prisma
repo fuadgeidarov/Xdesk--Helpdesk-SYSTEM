@@ -1,0 +1,276 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  AGENT
+  ADMIN
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_RESPONSE
+  RESOLVED
+  CLOSED
+}
+
+enum PresenceStatus {
+  ONLINE
+  AWAY
+  OFFLINE
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TicketSource {
+  WEB
+  TELEGRAM
+}
+
+enum AuthEventType {
+  REGISTER
+  LOGIN
+  LOGOUT
+  VISIT
+  PASSWORD_RESET_REQUEST
+  PASSWORD_RESET
+}
+
+enum ArticleVisibility {
+  STAFF
+  ALL
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  department   String?
+  position     String?
+  phone        String?
+  address      String?
+  store        String?
+  avatarStoredName String?
+  avatarMimeType   String?
+  avatarUpdatedAt  DateTime?
+  role         Role      @default(USER)
+  isActive     Boolean   @default(true)
+  isBlocked    Boolean   @default(false)
+  sessionVersion Int      @default(0)
+  lastSeenAt   DateTime?
+  presenceStatus PresenceStatus @default(OFFLINE)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  ticketsCreated  Ticket[]           @relation("TicketAuthor")
+  ticketsAssigned Ticket[]           @relation("TicketAssignee")
+  comments        Comment[]
+  ratingsGiven    Rating[]           @relation("RatingAuthor")
+  ratingsReceived Rating[]           @relation("RatedAgent")
+  authEvents      AuthEvent[]
+  articles        KnowledgeArticle[] @relation("ArticleAuthor")
+  passwordResetTokens PasswordResetToken[]
+
+  @@index([role])
+  @@index([isActive, isBlocked, role])
+  @@index([role, isActive, isBlocked, presenceStatus])
+  @@index([createdAt])
+  @@index([department])
+  @@index([store])
+}
+
+model Ticket {
+  id             String       @id @default(cuid())
+  number         Int          @unique @default(autoincrement())
+  title          String
+  description    String
+  status         TicketStatus @default(OPEN)
+  priority       Priority     @default(MEDIUM)
+  category       String       @default("Общее")
+  guestName      String?
+  guestEmail     String?
+  guestPhone     String?
+  store          String?
+  source         TicketSource @default(WEB)
+  telegramChatId String?
+  telegramUserId String?
+  telegramUsername String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  lastActivityAt DateTime     @default(now())
+  closedAt       DateTime?
+
+  authorId   String?
+  assigneeId String?
+
+  author      User?        @relation("TicketAuthor", fields: [authorId], references: [id])
+  assignee    User?        @relation("TicketAssignee", fields: [assigneeId], references: [id])
+  comments    Comment[]
+  rating      Rating?
+  attachments Attachment[]
+
+  @@index([status, createdAt])
+  @@index([authorId, createdAt, id])
+  @@index([assigneeId, status])
+  @@index([priority, status])
+  @@index([status, priority, lastActivityAt, id])
+  @@index([status, assigneeId, priority, lastActivityAt, id])
+  @@index([category])
+  @@index([lastActivityAt, id])
+  @@index([createdAt, id])
+  @@index([status, lastActivityAt, id])
+  @@index([assigneeId, status, lastActivityAt, id])
+  @@index([assigneeId, createdAt, id])
+  @@index([closedAt, assigneeId, id])
+  @@index([guestEmail])
+  @@index([guestPhone])
+  @@index([store, status, lastActivityAt, id])
+  @@index([source, createdAt, id])
+  @@index([telegramChatId, createdAt, id])
+  @@index([telegramUserId, createdAt, id])
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  body       String
+  isInternal Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  ticketId String
+  authorId String?
+  source TicketSource @default(WEB)
+  externalAuthorName String?
+  externalMessageId String? @unique
+
+  ticket      Ticket       @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author      User?        @relation(fields: [authorId], references: [id])
+  attachments Attachment[]
+
+  @@index([ticketId, createdAt, id])
+  @@index([ticketId, isInternal, createdAt, id])
+  @@index([authorId])
+  @@index([authorId, createdAt, id])
+  @@index([source, createdAt, id])
+}
+
+
+model Attachment {
+  id         String   @id @default(cuid())
+  filename   String
+  storedName String
+  mimeType   String
+  size       Int
+  createdAt  DateTime @default(now())
+
+  ticketId  String?
+  commentId String?
+
+  ticket  Ticket?  @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@index([commentId])
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  score     Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  ticketId String  @unique
+  authorId String?
+  agentId  String
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author User?  @relation("RatingAuthor", fields: [authorId], references: [id])
+  agent  User   @relation("RatedAgent", fields: [agentId], references: [id])
+
+  @@index([agentId, createdAt])
+  @@index([agentId, score, createdAt])
+  @@index([score])
+  @@index([createdAt])
+}
+
+/// База знаний: все авторизованные пользователи читают; наполняет и редактирует только администратор.
+model KnowledgeArticle {
+  id         String            @id @default(cuid())
+  title      String
+  summary    String?
+  body       String
+  category   String            @default("Общее")
+  tags       String[]          @default([])
+  visibility ArticleVisibility @default(ALL)
+  isPinned   Boolean           @default(false)
+  views      Int               @default(0)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  authorId String?
+  author   User?   @relation("ArticleAuthor", fields: [authorId], references: [id])
+  attachments KnowledgeAttachment[]
+
+  @@index([category])
+  @@index([visibility, isPinned, updatedAt])
+  @@index([updatedAt])
+}
+
+model KnowledgeAttachment {
+  id         String   @id @default(cuid())
+  filename   String
+  storedName String   @unique
+  mimeType   String
+  size       Int
+  createdAt  DateTime @default(now())
+
+  articleId String
+  article   KnowledgeArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@index([articleId, createdAt])
+}
+
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([expiresAt])
+}
+
+/// Журнал регистраций, входов и посещений портала.
+model AuthEvent {
+  id        String        @id @default(cuid())
+  type      AuthEventType
+  email     String?
+  ip        String?
+  userAgent String?
+  createdAt DateTime      @default(now())
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([type, createdAt])
+  @@index([createdAt])
+}

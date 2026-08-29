@@ -1,0 +1,17 @@
+node_modules
+.next
+.git
+.github
+.env
+.env.*
+!.env.example
+*.log
+*.zip
+*.pem
+*.key
+certbot
+letsencrypt
+uploads
+.DS_Store
+Thumbs.db
+tsconfig.tsbuildinfo

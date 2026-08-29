@@ -1,0 +1,162 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    shm_size: 256mb
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-xdesk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-xdesk}
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    command:
+      - postgres
+      - -c
+      - max_connections=100
+      - -c
+      - shared_buffers=256MB
+      - -c
+      - effective_cache_size=768MB
+      - -c
+      - maintenance_work_mem=64MB
+      - -c
+      - checkpoint_completion_target=0.9
+      - -c
+      - wal_compression=on
+      - -c
+      - max_wal_size=2GB
+      - -c
+      - min_wal_size=256MB
+      - -c
+      - autovacuum=on
+      - -c
+      - log_min_duration_statement=1000
+    volumes:
+      - xdesk_pg:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          PGPASSWORD="$${POSTGRES_PASSWORD}" psql -h 127.0.0.1 -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}" -tAc "SELECT 1" >/dev/null 2>&1
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  app:
+    build: .
+    restart: unless-stopped
+    init: true
+    # Port 3000 is intentionally not published to LAN/Internet anymore.
+    # Nginx reaches the application over the private Docker network.
+    expose:
+      - "3000"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-xdesk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-xdesk}
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env}
+      NODE_ENV: production
+      UPLOAD_DIR: /app/uploads
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      DB_CONNECTION_LIMIT: ${DB_CONNECTION_LIMIT:-20}
+      DB_POOL_TIMEOUT: ${DB_POOL_TIMEOUT:-20}
+      DB_TRANSACTION_MAX_WAIT_MS: ${DB_TRANSACTION_MAX_WAIT_MS:-10000}
+      DB_TRANSACTION_TIMEOUT_MS: ${DB_TRANSACTION_TIMEOUT_MS:-15000}
+      DB_STARTUP_CHECK: ${DB_STARTUP_CHECK:-true}
+      SEED_DEFAULT_USERS: ${SEED_DEFAULT_USERS:-false}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@xdesk.local}
+      SEED_AGENT_EMAIL: ${SEED_AGENT_EMAIL:-agent@xdesk.local}
+      SEED_USER_EMAIL: ${SEED_USER_EMAIL:-user@xdesk.local}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-}
+      SEED_AGENT_PASSWORD: ${SEED_AGENT_PASSWORD:-}
+      SEED_USER_PASSWORD: ${SEED_USER_PASSWORD:-}
+      SESSION_TTL_HOURS: ${SESSION_TTL_HOURS:-24}
+      TRUST_PROXY: ${TRUST_PROXY:-true}
+      APP_URL: ${APP_URL:-http://localhost}
+      SMTP_PROVIDER: ${SMTP_PROVIDER:-custom}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-}
+      SMTP_SECURE: ${SMTP_SECURE:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_ALLOW_ANONYMOUS: ${SMTP_ALLOW_ANONYMOUS:-false}
+      SMTP_TLS_REJECT_UNAUTHORIZED: ${SMTP_TLS_REJECT_UNAUTHORIZED:-true}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+    volumes:
+      - xdesk_uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 256
+    stop_grace_period: 20s
+
+  telegram-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.telegram
+    restart: unless-stopped
+    init: true
+    environment:
+      TELEGRAM_BOT_ENABLED: ${TELEGRAM_BOT_ENABLED:-false}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      BOT_COMPANY_NAME: ${BOT_COMPANY_NAME:-Xdesk}
+      XDESK_INTERNAL_URL: http://app:3000
+    depends_on:
+      app:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 64
+    stop_grace_period: 10s
+
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:-localhost}
+      TLS_CERT_NAME: ${TLS_CERT_NAME:-localhost}
+    volumes:
+      - xdesk_letsencrypt:/etc/letsencrypt:ro
+      - xdesk_certbot_webroot:/var/www/certbot:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 15s
+    security_opt:
+      - no-new-privileges:true
+
+  certbot:
+    image: certbot/certbot:latest
+    profiles: ["tools"]
+    volumes:
+      - xdesk_letsencrypt:/etc/letsencrypt
+      - xdesk_certbot_webroot:/var/www/certbot
+
+volumes:
+  xdesk_pg:
+  xdesk_uploads:
+  xdesk_letsencrypt:
+  xdesk_certbot_webroot:
